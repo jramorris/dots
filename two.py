@@ -1,13 +1,15 @@
 import pygame
 import time
 
+from engine import GameEngine
+
 pygame.init()
-display_width = 200
-display_height = 150
+DISPLAY_WIDTH = 200
+DISPLAY_HEIGHT = 150
 black = (0, 0, 0)
 white = (240, 240, 240)
 
-gameDisplay = pygame.display.set_mode((display_width, display_height))
+gameDisplay = pygame.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
 pygame.display.set_caption('try 2')
 clock = pygame.time.Clock()
 
@@ -33,6 +35,20 @@ def message_display(text):
 
 
 def game_loop():
+    engine = GameEngine()
+    running = True
+
+    while running:
+        clock.tick(60)
+
+        if pygame.event.get(pygame.QUIT):
+            running = False
+            return
+        engine.scene.handle_events(pygame.event.get())
+        engine.scene.update()
+        engine.scene.render(gameDisplay)
+        pygame.display.flip()
+    """
     x = display_width / 2
     y = display_height / 2
     key_down = False
@@ -40,11 +56,6 @@ def game_loop():
     dead = False
 
     while game_on:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-
             if not dead:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_LEFT:
@@ -76,6 +87,7 @@ def game_loop():
 
         pygame.display.update()
         clock.tick(60)
+    """
 
 game_loop()
 pygame.quit()
