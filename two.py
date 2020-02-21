@@ -2,18 +2,16 @@ import pygame
 import time
 
 from engine import GameEngine
+from constants import DISPLAY_WIDTH, DISPLAY_HEIGHT, BLACK, WHITE
 
 pygame.init()
-DISPLAY_WIDTH = 200
-DISPLAY_HEIGHT = 150
-black = (0, 0, 0)
-white = (240, 240, 240)
 
 gameDisplay = pygame.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
 pygame.display.set_caption('try 2')
 clock = pygame.time.Clock()
 
 hero = pygame.image.load('green-dot.jpg')
+
 
 def move_image(img, x, y):
     gameDisplay.blit(img, (x, y))
@@ -22,7 +20,7 @@ def game_over():
     message_display('whoops')
 
 def text_objects(text, font):
-    text_surface = font.render(text, True, black)
+    text_surface = font.render(text, True, BLACK)
     return text_surface, text_surface.get_rect()
 
 def message_display(text):
