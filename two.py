@@ -7,7 +7,7 @@ from constants import DISPLAY_WIDTH, DISPLAY_HEIGHT, BLACK, WHITE
 pygame.init()
 
 gameDisplay = pygame.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
-pygame.display.set_caption('try 2')
+pygame.display.set_caption('waddupppp')
 clock = pygame.time.Clock()
 
 hero = pygame.image.load('green-dot.jpg')
@@ -37,7 +37,7 @@ def game_loop():
     running = True
 
     while running:
-        clock.tick(60)
+        clock.tick(40)
 
         if pygame.event.get(pygame.QUIT):
             running = False

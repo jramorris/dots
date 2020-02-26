@@ -1,7 +1,9 @@
 import pygame
 
-from players import GameObject, Enemy
+from players import Enemy, Player, Target
 from constants import DISPLAY_WIDTH, DISPLAY_HEIGHT
+
+KEYS = (pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN)
 
 
 class GameScene(object):
@@ -41,34 +43,45 @@ class TitleScene(GameScene):
 
 
 class LevelOne(GameScene):
-    def __init__(self):
+    def __init__(self, score=0):
         super(LevelOne, self).__init__()
         self.font = pygame.font.SysFont('Arial', 32)
-        self.player = GameObject(pygame.image.load('green-dot.jpg'))
-        self.enemies = [Enemy(pygame.image.load('black-dot.jpg')) for x in range(5)]
+        self.player = Player(pygame.image.load('green-dot.jpg').convert_alpha())
+        self.enemies = [Enemy(pygame.image.load('black-dot.jpg').convert_alpha(), speed=1, y_pos=100) for x in range(5)]
+        self.target = Target(pygame.image.load('red-dot.jpg').convert_alpha(), speed=1, y_pos=100)
         self.dead = False
+        self.score = score
+        self.score_text = score
 
     def handle_events(self, events):
         pass
 
     def render(self, screen):
         screen.fill((240, 240, 240))
-        screen.blit(self.player.image, (self.player.rect))
+        screen.blit(self.player.image, self.player.rect)
+        score_text = self.font.render(str(self.score), True, (0,0,0))
+        screen.blit(score_text, (0,0))
         for enemy in self.enemies:
-            screen.blit(enemy.image, (enemy.rect))
+            screen.blit(enemy.image, enemy.rect)
+        screen.blit(self.target.image, self.target.rect)
         if self.dead:
             self.manager.go_to(DeathScene())
 
     def update(self):
         pressed = pygame.key.get_pressed()
-        left, right, up, down = [pressed[key] for key in (pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN)]
+        left, right, up, down = [pressed[key] for key in KEYS]
         self.player.update(left, right, up, down)
         for enemy in self.enemies:
             enemy.update()
+        self.target.update()
         collide = any(self.player.rect.colliderect(enemy.rect) for enemy in self.enemies)
+        if self.player.rect.colliderect(self.target.rect):
+            self.score += 1
+            self.enemies.append(Enemy(pygame.image.load('black-dot.jpg').convert_alpha(), speed=1, y_pos=100))
+            self.target.rect.top = self.player.rect.left
+            self.target.rect.left = self.player.rect.top
         if collide:
             self.dead = True
-        #self.camera.update(self.player)
 
 
 class DeathScene(GameScene):

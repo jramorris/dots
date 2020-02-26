@@ -17,4 +17,3 @@ def game_over(end_text='Game Over'):
     text_x = screen.get_width() / 2 - text_rect.width / 2
     text_y = screen.get_height() / 2 - text_rect.height / 2
     screen.blit(text, [text_x, text_y])
-
