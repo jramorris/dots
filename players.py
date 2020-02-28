@@ -6,7 +6,7 @@ from constants import DISPLAY_WIDTH, DISPLAY_HEIGHT
 
 
 class GameObject(object):
-    def __init__(self, image, speed=5, x_pos=100, y_pos=75):
+    def __init__(self, image, speed=5, x_pos=(DISPLAY_WIDTH / 2), y_pos=75):
         self.speed = speed
         self.image = image
         self.rect = self.image.get_rect()

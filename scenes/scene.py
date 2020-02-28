@@ -89,6 +89,8 @@ class DeathScene(GameScene):
         super(DeathScene, self).__init__()
         self.start_time = pygame.time.get_ticks()
         self.font = pygame.font.SysFont('Arial', 32)
+        pygame.mixer.music.load('fart.mp3')
+        self.played = False
 
     def handle_events(self, events):
         if pygame.time.get_ticks() - self.start_time > 2000:
@@ -98,8 +100,13 @@ class DeathScene(GameScene):
         pass
 
     def render(self, screen):
-        # beware: ugly! 
+        if pygame.time.get_ticks() - self.start_time > 400 and not self.played:
+            self.played = True
+            pygame.mixer.music.play()
+
         if pygame.time.get_ticks() - self.start_time > 500:
             screen.fill((255, 255, 255))
             text = self.font.render('Dead', True, (0,0,0))
-            screen.blit(text, (10, 75))
+            width = text.get_rect().width / 2
+            height = text.get_rect().height / 2
+            screen.blit(text, (DISPLAY_WIDTH / 2 - width, DISPLAY_HEIGHT / 2 - height))
