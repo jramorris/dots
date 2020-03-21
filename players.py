@@ -1,6 +1,6 @@
 import random
 
-from pygame import time as pytime
+from pygame import image
 
 from constants import DISPLAY_WIDTH, DISPLAY_HEIGHT
 
@@ -25,6 +25,15 @@ class GameObject(object):
             self.rect.left = 0
         if self.rect.left < 0:
             self.rect.left = DISPLAY_WIDTH
+
+    @classmethod
+    def init_random(cls, x_pos=None, y_pos=None):
+        if not x_pos:
+            x_pos = random.randint(0, DISPLAY_WIDTH)
+        if not y_pos:
+            y_pos = random.randint(0, DISPLAY_HEIGHT)
+        return cls(image.load('black-dot.jpg').convert_alpha(), speed=1,
+                   x_pos=x_pos, y_pos=y_pos)
 
 
 class Player(GameObject):
@@ -55,3 +64,11 @@ class Enemy(GameObject):
 
 class Target(Enemy):
     pass
+
+    def reset(self, x_pos=None, y_pos=None):
+        if not x_pos:
+            x_pos = random.randint(0, DISPLAY_WIDTH)
+        if not y_pos:
+            y_pos = random.randint(0, DISPLAY_HEIGHT)
+        self.rect.top = x_pos
+        self.rect.left = y_pos

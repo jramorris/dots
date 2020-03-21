@@ -1,3 +1,5 @@
+import random
+
 import pygame
 
 from players import Enemy, Player, Target
@@ -48,7 +50,7 @@ class LevelOne(GameScene):
         self.font = pygame.font.SysFont('Arial', 32)
         self.player = Player(pygame.image.load('green-dot.jpg').convert_alpha())
         self.enemies = [Enemy(pygame.image.load('black-dot.jpg').convert_alpha(), speed=1, y_pos=100) for x in range(5)]
-        self.target = Target(pygame.image.load('red-dot.jpg').convert_alpha(), speed=1, y_pos=100)
+        self.target = Target(pygame.image.load('red-dot.jpg').convert_alpha(), speed=2, y_pos=100)
         self.dead = False
         self.score = score
         self.score_text = score
@@ -77,9 +79,8 @@ class LevelOne(GameScene):
         collide = any(self.player.rect.colliderect(enemy.rect) for enemy in self.enemies)
         if self.player.rect.colliderect(self.target.rect):
             self.score += 1
-            self.enemies.append(Enemy(pygame.image.load('black-dot.jpg').convert_alpha(), speed=1, y_pos=100))
-            self.target.rect.top = self.player.rect.left
-            self.target.rect.left = self.player.rect.top
+            self.enemies.append(Enemy.init_random())
+            self.target.reset()
         if collide:
             self.dead = True
 
