@@ -27,6 +27,7 @@ class TitleScene(GameScene):
         super(TitleScene, self).__init__()
         self.start_time = pygame.time.get_ticks()
         self.font = pygame.font.SysFont('Arial', 32)
+        self.rects_to_update = []
 
     def handle_events(self, events):
         if pygame.time.get_ticks() - self.start_time > 2000:
@@ -42,6 +43,7 @@ class TitleScene(GameScene):
         width = text.get_rect().width / 2
         height = text.get_rect().height / 2
         screen.blit(text, (DISPLAY_WIDTH / 2 - width, DISPLAY_HEIGHT / 2 - height))
+        self.rects_to_update.append(text.get_rect())
 
 
 class LevelOne(GameScene):
@@ -54,6 +56,7 @@ class LevelOne(GameScene):
         self.dead = False
         self.score = score
         self.score_text = score
+        self.rects_to_update = []
 
     def handle_events(self, events):
         pass
@@ -61,11 +64,14 @@ class LevelOne(GameScene):
     def render(self, screen):
         screen.fill((240, 240, 240))
         screen.blit(self.player.image, self.player.rect)
+        self.rects_to_update.append(self.player.rect)
         score_text = self.font.render(str(self.score), True, (0,0,0))
         screen.blit(score_text, (0,0))
         for enemy in self.enemies:
             screen.blit(enemy.image, enemy.rect)
+            self.rects_to_update.append(enemy.rect)
         screen.blit(self.target.image, self.target.rect)
+        self.rects_to_update.append(self.target.rect)
         if self.dead:
             self.manager.go_to(DeathScene())
 
@@ -73,8 +79,10 @@ class LevelOne(GameScene):
         pressed = pygame.key.get_pressed()
         left, right, up, down = [pressed[key] for key in KEYS]
         self.player.update(left, right, up, down)
+
         for enemy in self.enemies:
             enemy.update()
+
         self.target.update()
         collide = any(self.player.rect.colliderect(enemy.rect) for enemy in self.enemies)
         if self.player.rect.colliderect(self.target.rect):
@@ -92,6 +100,7 @@ class DeathScene(GameScene):
         self.font = pygame.font.SysFont('Arial', 32)
         pygame.mixer.music.load('fart.mp3')
         self.played = False
+        self.rects_to_update = []
 
     def handle_events(self, events):
         if pygame.time.get_ticks() - self.start_time > 2000:
@@ -111,3 +120,4 @@ class DeathScene(GameScene):
             width = text.get_rect().width / 2
             height = text.get_rect().height / 2
             screen.blit(text, (DISPLAY_WIDTH / 2 - width, DISPLAY_HEIGHT / 2 - height))
+            self.rects_to_update.append(text.get_rect())

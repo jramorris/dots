@@ -45,7 +45,8 @@ def game_loop():
         engine.scene.handle_events(pygame.event.get())
         engine.scene.update()
         engine.scene.render(gameDisplay)
-        pygame.display.flip()
+        pygame.display.update(engine.scene.rects_to_update)
+        engine.scene.rects_to_update = []
     """
     x = display_width / 2
     y = display_height / 2
