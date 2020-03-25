@@ -5,7 +5,12 @@ import pygame
 from players import Enemy, Player, Target
 from constants import DISPLAY_WIDTH, DISPLAY_HEIGHT
 
-KEYS = (pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN)
+LEFT = (pygame.K_LEFT, pygame.K_a)
+RIGHT = (pygame.K_RIGHT, pygame.K_d)
+UP = (pygame.K_UP, pygame.K_w)
+DOWN = (pygame.K_DOWN, pygame.K_s)
+KEYS = (LEFT, RIGHT, UP, DOWN)
+KEYS_2 = (pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN)
 
 
 class GameScene(object):
@@ -20,6 +25,30 @@ class GameScene(object):
 
     def handle_events(self, events):
         raise NotImplementedError
+
+
+class TitleScene(GameScene):
+    def __init__(self):
+        super(TitleScene, self).__init__()
+        self.start_time = pygame.time.get_ticks()
+        self.font = pygame.font.SysFont('Arial', 32)
+        self.rects_to_update = []
+
+    def handle_events(self, events):
+        if pygame.time.get_ticks() - self.start_time > 2000:
+            self.manager.go_to(LevelOne())
+
+    def update(self):
+        pass
+
+    def render(self, screen):
+        # beware: ugly! 
+        screen.fill((0,0,0))
+        text = self.font.render('Ready?', True, (255, 255, 255))
+        width = text.get_rect().width / 2
+        height = text.get_rect().height / 2
+        screen.blit(text, (DISPLAY_WIDTH / 2 - width, DISPLAY_HEIGHT / 2 - height))
+        self.rects_to_update.append(text.get_rect())
 
 
 class TitleScene(GameScene):
@@ -72,12 +101,13 @@ class LevelOne(GameScene):
             self.rects_to_update.append(enemy.rect)
         screen.blit(self.target.image, self.target.rect)
         self.rects_to_update.append(self.target.rect)
+
+    def update(self):
         if self.dead:
             self.manager.go_to(DeathScene())
 
-    def update(self):
         pressed = pygame.key.get_pressed()
-        left, right, up, down = [pressed[key] for key in KEYS]
+        left, right, up, down = [any(pressed[key] for key in key_set) for key_set in KEYS]
         self.player.update(left, right, up, down)
 
         for enemy in self.enemies:
