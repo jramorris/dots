@@ -15,7 +15,7 @@ KEYS_2 = (pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN)
 
 class GameScene(object):
     def __init__(self):
-        pass
+        self.rects_to_update = []
 
     def render(self, screen):
         raise NotImplementedError
@@ -27,12 +27,58 @@ class GameScene(object):
         raise NotImplementedError
 
 
+class Menu(GameScene):
+    def __init__(self):
+        super(Menu, self).__init__()
+        self.font = pygame.font.SysFont('Arial', 32)
+        self.texts = [('Press Enter', TitleScene), ('Change Theme', Menu)]
+        self.val = 0
+
+    def handle_events(self, events):
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    update = False
+                    if self.val:
+                        update = True
+                    self.manager.go_to(self.texts[self.val][1](), update)
+                else:
+                    self.toggle_val()
+
+    def update(self):
+        pass
+
+    def render(self, screen):
+        screen.fill(self.manager.theme)
+        counter = 0
+        for idx, text_tuple in enumerate(self.texts):
+            counter = idx + 1
+            copy = text_tuple[0]
+            if idx == self.val:
+                copy = '> ' + copy + ' <'
+            text = self.font.render(copy, True, (34, 139, 34))
+            width = text.get_rect().width / 2
+            height = text.get_rect().height / 2
+            item_height = DISPLAY_HEIGHT / (len(self.texts) + 1)
+            screen.blit(text, (DISPLAY_WIDTH / 2 - width, (item_height * counter) - height))
+            self.rects_to_update.append(text.get_rect())
+
+    def toggle_val(self):
+        if self.val:
+            self.val = 0
+        else:
+            self.val = 1
+
+
+class Settings(Menu):
+    pass
+
+
 class TitleScene(GameScene):
     def __init__(self):
         super(TitleScene, self).__init__()
         self.start_time = pygame.time.get_ticks()
         self.font = pygame.font.SysFont('Arial', 32)
-        self.rects_to_update = []
 
     def handle_events(self, events):
         if pygame.time.get_ticks() - self.start_time > 2000:
@@ -43,31 +89,7 @@ class TitleScene(GameScene):
 
     def render(self, screen):
         # beware: ugly! 
-        screen.fill((0,0,0))
-        text = self.font.render('Ready?', True, (255, 255, 255))
-        width = text.get_rect().width / 2
-        height = text.get_rect().height / 2
-        screen.blit(text, (DISPLAY_WIDTH / 2 - width, DISPLAY_HEIGHT / 2 - height))
-        self.rects_to_update.append(text.get_rect())
-
-
-class TitleScene(GameScene):
-    def __init__(self):
-        super(TitleScene, self).__init__()
-        self.start_time = pygame.time.get_ticks()
-        self.font = pygame.font.SysFont('Arial', 32)
-        self.rects_to_update = []
-
-    def handle_events(self, events):
-        if pygame.time.get_ticks() - self.start_time > 2000:
-            self.manager.go_to(LevelOne())
-
-    def update(self):
-        pass
-
-    def render(self, screen):
-        # beware: ugly! 
-        screen.fill((0,0,0))
+        screen.fill(self.manager.theme)
         text = self.font.render('Ready?', True, (255, 255, 255))
         width = text.get_rect().width / 2
         height = text.get_rect().height / 2
@@ -85,13 +107,12 @@ class LevelOne(GameScene):
         self.dead = False
         self.score = score
         self.score_text = score
-        self.rects_to_update = []
 
     def handle_events(self, events):
         pass
 
     def render(self, screen):
-        screen.fill((240, 240, 240))
+        screen.fill(self.manager.theme)
         screen.blit(self.player.image, self.player.rect)
         self.rects_to_update.append(self.player.rect)
         score_text = self.font.render(str(self.score), True, (0,0,0))
@@ -130,11 +151,10 @@ class DeathScene(GameScene):
         self.font = pygame.font.SysFont('Arial', 32)
         pygame.mixer.music.load('fart.mp3')
         self.played = False
-        self.rects_to_update = []
 
     def handle_events(self, events):
         if pygame.time.get_ticks() - self.start_time > 2000:
-            self.manager.go_to(TitleScene())
+            self.manager.go_to(Menu())
 
     def update(self):
         pass
